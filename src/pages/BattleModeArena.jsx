@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Cpu, Loader2, Trophy, AlertCircle, ArrowLeft } from "lucide-react";
+import {
+  Cpu,
+  Loader2,
+  Trophy,
+  AlertCircle,
+  ArrowLeft,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { runAgent } from "../lib/llmAdapter";
 import BattleNavbar from "../components/BattleNavbar";
 import ReactMarkdown from "react-markdown";
@@ -175,6 +183,116 @@ export default function BattleModeArena() {
             <span className="text-white font-semibold">{agent.name}</span>{" "}
             across three providers
           </p>
+        </div>
+
+        {/* Prompt Comparison Viewer */}
+        <div className="max-w-7xl mx-auto mb-6">
+          <button
+            onClick={() => setPromptViewerOpen(!promptViewerOpen)}
+            className="w-full flex items-center justify-between px-5 py-3 rounded-lg bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-gray-700 transition-all duration-200"
+          >
+            <span className="text-sm font-semibold text-gray-200">
+              Prompt Comparison Viewer
+            </span>
+            {promptViewerOpen ? (
+              <ChevronDown size={18} className="text-gray-400" />
+            ) : (
+              <ChevronRight size={18} className="text-gray-400" />
+            )}
+          </button>
+
+          {promptViewerOpen && (
+            <div className="mt-4 battle-fade-in">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* OpenAI Column */}
+                <div className="rounded-xl border border-gray-800 bg-gray-900/30 backdrop-blur-sm flex flex-col overflow-hidden">
+                  <div className="bg-gray-900/50 border-b border-gray-800 px-4 py-3">
+                    <span className="text-sm font-bold text-yellow-400">
+                      OpenAI
+                    </span>
+                  </div>
+                  <div className="p-4 space-y-4">
+                    <div>
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                        System Prompt
+                      </span>
+                      <pre className="whitespace-pre-wrap mt-2 text-xs text-gray-300 bg-gray-900/50 p-3 rounded-lg border border-gray-800">
+                        {prompts.openai?.systemPrompt ||
+                          "Prompt not available yet."}
+                      </pre>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                        User Prompt
+                      </span>
+                      <pre className="whitespace-pre-wrap mt-2 text-xs text-gray-300 bg-gray-900/50 p-3 rounded-lg border border-gray-800">
+                        {prompts.openai?.userMessage ||
+                          "Prompt not available yet."}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Claude Column */}
+                <div className="rounded-xl border border-gray-800 bg-gray-900/30 backdrop-blur-sm flex flex-col overflow-hidden">
+                  <div className="bg-gray-900/50 border-b border-gray-800 px-4 py-3">
+                    <span className="text-sm font-bold text-violet-400">
+                      Claude
+                    </span>
+                  </div>
+                  <div className="p-4 space-y-4">
+                    <div>
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                        System Prompt
+                      </span>
+                      <pre className="whitespace-pre-wrap mt-2 text-xs text-gray-300 bg-gray-900/50 p-3 rounded-lg border border-gray-800">
+                        {prompts.anthropic?.systemPrompt ||
+                          "Prompt not available yet."}
+                      </pre>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                        User Prompt
+                      </span>
+                      <pre className="whitespace-pre-wrap mt-2 text-xs text-gray-300 bg-gray-900/50 p-3 rounded-lg border border-gray-800">
+                        {prompts.anthropic?.userMessage ||
+                          "Prompt not available yet."}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Gemini Column */}
+                <div className="rounded-xl border border-gray-800 bg-gray-900/30 backdrop-blur-sm flex flex-col overflow-hidden">
+                  <div className="bg-gray-900/50 border-b border-gray-800 px-4 py-3">
+                    <span className="text-sm font-bold text-blue-400">
+                      Gemini
+                    </span>
+                  </div>
+                  <div className="p-4 space-y-4">
+                    <div>
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                        System Prompt
+                      </span>
+                      <pre className="whitespace-pre-wrap mt-2 text-xs text-gray-300 bg-gray-900/50 p-3 rounded-lg border border-gray-800">
+                        {prompts.gemini?.systemPrompt ||
+                          "Prompt not available yet."}
+                      </pre>
+                    </div>
+                    <div>
+                      <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                        User Prompt
+                      </span>
+                      <pre className="whitespace-pre-wrap mt-2 text-xs text-gray-300 bg-gray-900/50 p-3 rounded-lg border border-gray-800">
+                        {prompts.gemini?.userMessage ||
+                          "Prompt not available yet."}
+                      </pre>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Three Columns */}
