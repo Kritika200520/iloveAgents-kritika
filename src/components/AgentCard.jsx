@@ -59,15 +59,19 @@ export default function AgentCard({ agent }) {
   return (
     <Link
       to={`/agent/${agent.id}`}
-      className="group block rounded-lg border p-4 transition-all duration-200
-        dark:bg-surface-card dark:border-border dark:hover:border-accent/40
-        bg-white border-gray-200 hover:border-indigo-300 hover:shadow-lg hover:shadow-accent/5"
+      
+      className="group block rounded-lg border p-4 bg-white border-gray-200 
+  dark:bg-surface-card dark:border-border
+  transition-all duration-500 [perspective:1000px]
+  hover:[transform:rotateX(6deg)_rotateY(-6deg)_translateY(-8px)]
+  hover:border-purple-400 dark:hover:border-accent
+  hover:shadow-[20px_20px_30px_rgba(0,0,0,0.07)] dark:hover:shadow-[0_20px_40px_rgba(var(--accent-rgb),0.15)]"
     >
       {/* Top row: icon + badges + star */}
       <div className="flex items-start justify-between mb-3">
         <div
           className="w-10 h-10 rounded-lg bg-accent/10 flex items-center justify-center
-          group-hover:bg-accent/20 transition-colors"
+          group-hover:bg-accent/20 group-hover:scale-110 group-hover:rotate-3 transition-all duration-300"
         >
           <IconComponent size={20} className="text-accent" />
         </div>
@@ -122,8 +126,8 @@ export default function AgentCard({ agent }) {
         >
           {provLabel}
         </span>
-        <span className="flex items-center gap-1 text-xs font-medium text-accent opacity-0 group-hover:opacity-100 transition-opacity">
-          Run <ArrowRight size={12} />
+        <span className="flex items-center gap-1 text-xs font-medium text-accent opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
+          Run <ArrowRight size={12} className="transition-transform duration-300 transform group-hover:translate-x-1" />
         </span>
       </div>
     </Link>
