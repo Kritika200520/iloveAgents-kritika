@@ -5,6 +5,8 @@ import { loadAllAgents } from '../agents/registry'
 
 export default function Sidebar({ open, onClose }) {
   const [sidebarSearchQuery, setSidebarSearchQuery] = useState('')
+  const [openCategories, setOpenCategories] = useState({})
+  const [searchExpandedCategories, setSearchExpandedCategories] = useState({})
   const [agents, setAgents] = useState([])
 
   useEffect(() => {
@@ -16,14 +18,25 @@ export default function Sidebar({ open, onClose }) {
     fetchAgents()
   }, [])
 
-  // Filter agents based on search query
-  // Normalize the query (trim + lowercase) so matching is case-insensitive
-  // and tolerant of leading/trailing whitespace in user input.
-  const normalizedQuery = sidebarSearchQuery.trim().toLowerCase()
-  const filteredAgents = agents.filter((agent) =>
-    agent.name.toLowerCase().includes(normalizedQuery) ||
-    agent.category.toLowerCase().includes(normalizedQuery)
-  )
+// Normalize the query (trim + lowercase) so matching is case-insensitive
+// and tolerant of leading/trailing whitespace in user input.
+const normalizedQuery = sidebarSearchQuery.trim().toLowerCase()
+const isSearching = normalizedQuery !== ''
+
+useEffect(() => {
+  if (!isSearching) {
+    setSearchExpandedCategories({})
+  }
+}, [isSearching])
+
+// Filter agents based on search query
+const filteredAgents = !normalizedQuery
+  ? agents
+  : agents.filter(
+      (agent) =>
+        agent.name.toLowerCase().includes(normalizedQuery) ||
+        agent.category.toLowerCase().includes(normalizedQuery)
+    )
 
   // Group agents by category
   const categories = filteredAgents.reduce((acc, agent) => {
@@ -33,6 +46,20 @@ export default function Sidebar({ open, onClose }) {
   }, {})
 
   const categoryOrder = Object.keys(categories)
+
+  const toggleCategory = (category) => {
+    if (isSearching) {
+      setSearchExpandedCategories((prev) => ({
+        ...prev,
+        [category]: !(prev[category] ?? true),
+      }))
+    } else {
+      setOpenCategories((prev) => ({
+        ...prev,
+        [category]: !prev[category],
+      }))
+    }
+  }
 
   return (
     <>
@@ -44,17 +71,18 @@ export default function Sidebar({ open, onClose }) {
         />
       )}
 
-    <aside
-      className={`fixed top-28 left-0 bottom-0 z-40 w-60 flex flex-col border-r transition-all duration-200
-        dark:bg-surface dark:border-border bg-white border-gray-200
-        ${open ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
-    >
-      
-        {/* Header */}
-        <div className="px-4 py-3 flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider dark:text-text-muted text-gray-400">
-            Agents
-          </span>
+
+<aside
+  className={`fixed top-14 left-0 bottom-0 z-40 w-60 flex flex-col border-r transition-all duration-200
+    dark:bg-surface dark:border-border bg-white border-gray-200
+    ${open ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
+>
+  {/* Header */}
+  <div className="px-4 py-3 flex items-center justify-between">
+    <span className="text-xs font-semibold uppercase tracking-wider dark:text-text-muted text-gray-400">
+      Agents
+    </span>
+
           <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-accent/10 text-accent">
             {filteredAgents.length}
           </span>
@@ -67,16 +95,20 @@ export default function Sidebar({ open, onClose }) {
               size={14}
               className="absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 dark:text-text-muted group-focus-within:text-accent transition-colors"
             />
+
             <input
               type="text"
               placeholder="Search agents..."
               aria-label="Search agents"
               value={sidebarSearchQuery}
-              onChange={(e) => setSidebarSearchQuery(e.target.value)}
+              onChange={(e) =>
+                setSidebarSearchQuery(e.target.value)
+              }
               className="w-full pl-8 pr-8 py-1.5 text-[12px] rounded-md border transition-all
                 dark:bg-surface-hover dark:border-border dark:text-text-primary dark:focus:border-accent/40
                 bg-gray-50 border-gray-200 text-gray-900 focus:border-accent/40 focus:ring-1 focus:ring-accent/10 outline-none"
             />
+
             {sidebarSearchQuery && (
               <button
                 type="button"
@@ -90,59 +122,91 @@ export default function Sidebar({ open, onClose }) {
           </div>
         </div>
 
-        {/* Agent List */}
-        <nav className="flex-1 overflow-y-auto px-2 pb-4">
-          {/* Suites link */}
-          <NavLink
-            to="/suites"
-            onClick={onClose}
-            className={({ isActive }) =>
-              `flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-medium transition-colors mb-2
-              ${isActive
-                ? 'bg-accent/10 text-accent dark:text-accent'
-                : 'dark:text-text-secondary dark:hover:text-text-primary dark:hover:bg-surface-hover text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-              }`
-            }
-          >
-            <span className="text-sm">✨</span>
-            <span className="truncate">Suites</span>
-          </NavLink>
+{/* Agent List */}
+<nav className="flex-1 overflow-y-auto px-2 pb-4">
+  {/* Suites link */}
+  <NavLink
+    to="/suites"
+    onClick={onClose}
+    className={({ isActive }) =>
+      `flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-medium transition-colors mb-2
+      ${
+        isActive
+          ? 'bg-accent/10 text-accent dark:text-accent'
+          : 'dark:text-text-secondary dark:hover:text-text-primary dark:hover:bg-surface-hover text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+      }`
+    }
+  >
+    <span className="text-sm">✨</span>
+    <span className="truncate">Suites</span>
+  </NavLink>
 
-          <div className="border-b dark:border-border border-gray-100 mb-2" />
-          {categoryOrder.map((category) => (
-            <div key={category} className="mb-3">
-              <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest dark:text-text-muted text-gray-400">
-                {category}
-              </div>
-              {categories[category].map((agent) => {
-                const IconComponent = Icons[agent.icon] || Icons.Bot
-                return (
-                  <NavLink
-                    key={agent.id}
-                    to={`/agent/${agent.id}`}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      `flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-medium transition-colors mb-0.5
-                      ${
-                        isActive
-                          ? 'bg-accent/10 text-accent dark:text-accent'
-                          : 'dark:text-text-secondary dark:hover:text-text-primary dark:hover:bg-surface-hover text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                      }`
-                    }
-                  >
-                    <IconComponent size={15} className="flex-shrink-0" />
-                    <span className="truncate">{agent.name}</span>
-                  </NavLink>
-                )
-              })}
-            </div>
-          ))}
-          {filteredAgents.length === 0 && (
-            <div className="px-4 py-8 text-center text-xs text-gray-400 dark:text-text-muted">
-              No agents found
-            </div>
+  <div className="border-b dark:border-border border-gray-100 mb-2" />
+
+  {categoryOrder.map((category) => {
+    const isCategoryExpanded = isSearching
+      ? (searchExpandedCategories[category] ?? true)
+      : Boolean(openCategories[category])
+
+    return (
+      <div key={category} className="mb-3">
+        <button
+          type="button"
+          onClick={() => toggleCategory(category)}
+          aria-expanded={isCategoryExpanded}
+          className="w-full flex items-center justify-between gap-2 px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest dark:text-text-muted text-gray-400 hover:text-accent transition-colors"
+        >
+          <span className="flex items-center gap-1.5 min-w-0">
+            <span className="truncate">{category}</span>
+
+            <span className="text-[9px] font-medium px-1.5 py-0.5 rounded-full bg-accent/10 text-accent tracking-normal">
+              {categories[category].length}
+            </span>
+          </span>
+
+          {isCategoryExpanded ? (
+            <Icons.ChevronDown size={12} className="flex-shrink-0" />
+          ) : (
+            <Icons.ChevronRight size={12} className="flex-shrink-0" />
           )}
-        </nav>
+        </button>
+
+        {isCategoryExpanded && (
+          <div className="mt-0.5">
+            {categories[category].map((agent) => {
+              const IconComponent = Icons[agent.icon] || Icons.Bot
+
+              return (
+                <NavLink
+                  key={agent.id}
+                  to={`/agent/${agent.id}`}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2.5 px-2.5 py-2 rounded-md text-[13px] font-medium transition-colors mb-0.5
+                    ${
+                      isActive
+                        ? 'bg-accent/10 text-accent dark:text-accent'
+                        : 'dark:text-text-secondary dark:hover:text-text-primary dark:hover:bg-surface-hover text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                    }`
+                  }
+                >
+                  <IconComponent size={15} className="flex-shrink-0" />
+                  <span className="truncate">{agent.name}</span>
+                </NavLink>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    )
+  })}
+
+  {filteredAgents.length === 0 && (
+    <div className="px-4 py-8 text-center text-xs text-gray-400 dark:text-text-muted">
+      No agents found
+    </div>
+  )}
+</nav>
 
         {/* Footer */}
         <div className="mt-auto px-4 py-3 border-t dark:border-border border-gray-200">
@@ -155,6 +219,7 @@ export default function Sidebar({ open, onClose }) {
             >
               GitHub →
             </a>
+
             <a
               href="https://github.com/AditthyaSS/iloveAgents/issues"
               target="_blank"
@@ -163,6 +228,7 @@ export default function Sidebar({ open, onClose }) {
             >
               Contribute →
             </a>
+
             <span className="block text-[10px] dark:text-text-muted/60 text-gray-300">
               GSSoC 2026
             </span>
