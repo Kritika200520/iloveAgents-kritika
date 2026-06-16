@@ -71,18 +71,17 @@ const filteredAgents = !normalizedQuery
         />
       )}
 
-      <aside
-        className={`fixed top-14 left-0 bottom-0 z-40 w-60 flex flex-col border-r transition-all duration-200
-          dark:bg-surface dark:border-border bg-white border-gray-200
-          ${
-            open ? 'translate-x-0' : '-translate-x-full'
-          } lg:translate-x-0`}
-      >
-        {/* Header */}
-        <div className="px-4 py-3 flex items-center justify-between">
-          <span className="text-xs font-semibold uppercase tracking-wider dark:text-text-muted text-gray-400">
-            Agents
-          </span>
+
+<aside
+  className={`fixed top-14 left-0 bottom-0 z-40 w-60 flex flex-col border-r transition-all duration-200
+    dark:bg-surface dark:border-border bg-white border-gray-200
+    ${open ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
+>
+  {/* Header */}
+  <div className="px-4 py-3 flex items-center justify-between">
+    <span className="text-xs font-semibold uppercase tracking-wider dark:text-text-muted text-gray-400">
+      Agents
+    </span>
 
           <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-full bg-accent/10 text-accent">
             {filteredAgents.length}
