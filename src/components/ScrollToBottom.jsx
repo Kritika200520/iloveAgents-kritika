@@ -55,6 +55,8 @@ export default function ScrollToBottom() {
       type="button"
       aria-label="Scroll to bottom"
       aria-hidden={!visible}
+      disabled={!visible}
+      aria-disabled={!visible}
       onClick={handleClick}
       tabIndex={visible ? 0 : -1}
       className={`fixed bottom-20 right-6 z-50 w-10 h-10 rounded-full border border-gray-200 dark:border-gray-700 bg-white dark:bg-surface hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-offset-gray-900 ${transitionClasses} ${visibilityClasses}`}
